@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
           const passwordsMatch = await compare(password, user.password ?? "");
           if (passwordsMatch) return user;
         }
-        
+
         return null;
       },
     }),
