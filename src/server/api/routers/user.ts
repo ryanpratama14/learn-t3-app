@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { hash } from "bcrypt";
 import { z } from "zod";
+import { prismaExclude } from "~/helper/utils";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 
@@ -18,6 +19,6 @@ export const userRouter = createTRPCRouter({
     }),
 
   detail: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.db.user.findFirst({ where: { id: ctx.session.user.id } });
+    return await ctx.db.user.findFirst({ where: { id: ctx.session.user.id }, select: prismaExclude("User", ["password"]) });
   }),
 });

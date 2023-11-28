@@ -9,6 +9,7 @@ const pagination = z.object({
 const order = z.enum(["asc", "desc"]).optional();
 
 export class schema {
+  static login = z.object({ email: z.string().email(), password: z.string().min(6) });
   static user = class {
     static sorting = z.array(
       z.object({

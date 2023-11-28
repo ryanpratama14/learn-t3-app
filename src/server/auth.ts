@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "~/env";
 import { db } from "~/server/db";
 import { compare } from "bcrypt";
-import { z } from "zod";
+import { schema } from "~/server/api/schema/schema";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -37,9 +37,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
-          .safeParse(credentials);
+        const parsedCredentials = schema.login.safeParse(credentials);
 
         if (parsedCredentials.success) {
           const { email, password } = parsedCredentials.data;
@@ -61,7 +59,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       return { ...token, ...user };
     },
-    session: async ({ session, token }) => {
+    async session({ session, token }) {
       return {
         ...session,
         user: {
