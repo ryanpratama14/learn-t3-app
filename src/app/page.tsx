@@ -5,7 +5,6 @@ import { api } from "~/trpc/server";
 
 export default async function Home() {
   const session = await getServerAuthSession();
-  // const data = await api.user.message.query();
 
   return (
     <Fragment>

@@ -10,12 +10,18 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
       if (data) THROW_ERROR("CONFLICT");
-      await ctx.db.user.create({ data: { email: input.email, password: await hash(input.password, 10) } });
-      return THROW_OK("ACCEPTED");
+      const hashedPassword = await hash(input.password, 10);
+      await ctx.db.user.create({ data: { email: input.email, password: hashedPassword } });
+      return THROW_OK("CREATED");
     }),
 
   detail: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.db.user.findFirst({ where: { id: ctx.session.user.id }, select: prismaExclude("User", ["password"]) });
+    const data = await ctx.db.user.findFirst({
+      where: { id: ctx.session.user.id },
+      select: prismaExclude("User", ["password"]),
+    });
+    if (!data) THROW_ERROR("NOT_FOUND");
+    return data;
   }),
 
   message: publicProcedure.query(() => ({ message: "Public message" })),
