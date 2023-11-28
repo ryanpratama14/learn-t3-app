@@ -2,9 +2,9 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { getServerSession, type DefaultSession, type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { compare } from "bcrypt";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { compare } from "bcrypt";
 import { schema } from "~/server/api/schema/schema";
 
 declare module "next-auth" {
