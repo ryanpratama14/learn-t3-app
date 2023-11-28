@@ -29,7 +29,6 @@ const handler = (req: NextRequest) =>
         ? ({ path, error, ctx, input, type }) => {
             consoleError("tRPC failed");
             consoleError(`path: api.${path ?? "<no-path>"}.${type}`);
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             consoleError(`input: ${JSON.stringify(input) ?? null}`);
             consoleError(`code: ${error.code}`);
             consoleError(`message: ${error.message}`);
