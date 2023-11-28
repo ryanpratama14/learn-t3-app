@@ -12,6 +12,12 @@ const createContext = async (req: NextRequest) => {
   });
 };
 
+const consoleError = (error: string) => {
+  console.error(
+    `❌ ${new Date().toLocaleTimeString(LOCALE_TAG, { hour: "2-digit", minute: "2-digit", second: "2-digit" })} 👉 ${error}`
+  );
+};
+
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
     endpoint: "/api/trpc",
@@ -20,14 +26,11 @@ const handler = (req: NextRequest) =>
     createContext: () => createContext(req),
     onError:
       env.NODE_ENV === "development"
-        ? ({ path, error }) => {
-            console.error(
-              `❌❌❌ ${new Date().toLocaleTimeString(LOCALE_TAG, {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              })} tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
-            );
+        ? ({ path, error, ctx }) => {
+            consoleError("tRPC failed");
+            consoleError(`path: ${path ?? "<no-path>"}`);
+            consoleError(`code: ${error.code}, message: ${error.message}`);
+            if (ctx?.session) consoleError(`user: ${JSON.stringify(ctx.session.user)}`);
           }
         : undefined,
   });

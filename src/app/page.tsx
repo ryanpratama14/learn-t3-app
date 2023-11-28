@@ -2,12 +2,14 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
+import Register from "./_components/register";
 
 export default async function Home() {
   const session = await getServerAuthSession();
 
   return (
     <Fragment>
+      <Register />
       <form
         className="flex flex-col gap-2 bg-gray-100"
         action={async (formData: FormData) => {
