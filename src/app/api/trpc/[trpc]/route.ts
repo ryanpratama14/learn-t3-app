@@ -2,6 +2,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { type NextRequest } from "next/server";
 
 import { env } from "~/env";
+import { LOCALE_TAG } from "~/helper/utils";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
 
@@ -20,7 +21,13 @@ const handler = (req: NextRequest) =>
     onError:
       env.NODE_ENV === "development"
         ? ({ path, error }) => {
-            console.error(`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`);
+            console.error(
+              `❌❌❌ ${new Date().toLocaleTimeString(LOCALE_TAG, {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })} tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
+            );
           }
         : undefined,
   });

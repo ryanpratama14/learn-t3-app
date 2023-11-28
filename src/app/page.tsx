@@ -14,7 +14,7 @@ export default async function Home() {
           "use server";
           const email = formData.get("email") as string;
           const password = formData.get("password") as string;
-          return api.user.register.mutate({ email, password });
+          return await api.user.register.mutate({ email, password });
         }}
       >
         <input className="p-2 border-2 border-gray-200 rounded-xl" name="email" type="email" required />
