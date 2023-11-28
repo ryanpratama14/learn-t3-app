@@ -1,4 +1,4 @@
-import { hash } from "bcrypt";
+import { hash } from "argon2";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
@@ -10,7 +10,7 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
       if (data) THROW_ERROR("CONFLICT");
-      const hashedPassword = await hash(input.password, 10);
+      const hashedPassword = await hash(input.password);
       await ctx.db.user.create({ data: { email: input.email, password: hashedPassword } });
       return THROW_OK("CREATED");
     }),

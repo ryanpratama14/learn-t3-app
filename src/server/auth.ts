@@ -2,7 +2,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { getServerSession, type DefaultSession, type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcrypt";
+import { verify } from "argon2";
 import { env } from "~/env";
 import { db } from "~/server/db";
 import { schema } from "~/server/api/schema/schema";
@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
           const { email, password } = parsedCredentials.data;
           const user = await db.user.findFirst({ where: { email } });
           if (!user) return null;
-          const passwordsMatch = await compare(password, user.password ?? "");
+          const passwordsMatch = await verify(user.password ?? "", password);
           if (passwordsMatch) return user;
         }
 
