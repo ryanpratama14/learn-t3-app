@@ -51,7 +51,7 @@ export const THROW_ERROR = (code: TRPC_ERROR_CODE_KEY) => {
   throw new TRPCError({ code, message: ERROR_MESSAGES[code] });
 };
 
-export const THROW_OK = (code: TRPC_OK_CODE_KEY) => ({ message: OK_MESSAGES[code] });
+export const THROW_OK = (code: TRPC_OK_CODE_KEY) => ({ code, message: OK_MESSAGES[code] });
 
 type A<T extends string> = T extends `${infer U}ScalarFieldEnum` ? U : never;
 type Entity = A<keyof typeof Prisma>;
