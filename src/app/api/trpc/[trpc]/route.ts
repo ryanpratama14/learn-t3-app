@@ -26,11 +26,14 @@ const handler = (req: NextRequest) =>
     createContext: () => createContext(req),
     onError:
       env.NODE_ENV === "development"
-        ? ({ path, error, ctx }) => {
+        ? ({ path, error, ctx, input, type }) => {
             consoleError("tRPC failed");
-            consoleError(`path: ${path ?? "<no-path>"}`);
-            consoleError(`code: ${error.code}, message: ${error.message}`);
-            if (ctx?.session) consoleError(`user: ${JSON.stringify(ctx.session.user)}`);
+            consoleError(`path: api.${path ?? "<no-path>"}.${type}`);
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            consoleError(`input: ${JSON.stringify(input) ?? null}`);
+            consoleError(`code: ${error.code}`);
+            consoleError(`message: ${error.message}`);
+            consoleError(`session: ${JSON.stringify(ctx?.session?.user) ?? null}`);
           }
         : undefined,
   });
