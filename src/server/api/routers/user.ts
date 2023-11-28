@@ -2,15 +2,16 @@ import { hash } from "bcrypt";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-import { prismaExclude, THROW_ERROR } from "~/trpc/shared";
+import { prismaExclude, THROW_ERROR, THROW_OK } from "~/trpc/shared";
 
 export const userRouter = createTRPCRouter({
   register: publicProcedure
     .input(z.object({ email: z.string().email(), password: z.string().min(4) }))
     .mutation(async ({ input, ctx }) => {
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
-      THROW_ERROR.NOT_FOUND(data);
-      return await ctx.db.user.create({ data: { email: input.email, password: await hash(input.password, 10) } });
+      if (data) THROW_ERROR("CONFLICT");
+      await ctx.db.user.create({ data: { email: input.email, password: await hash(input.password, 10) } });
+      return THROW_OK("ACCEPTED");
     }),
 
   detail: protectedProcedure.query(async ({ ctx }) => {

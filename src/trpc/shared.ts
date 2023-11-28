@@ -5,6 +5,8 @@ import { TRPCError } from "@trpc/server";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "~/server/api/root";
 import { type Pagination } from "~/server/api/schema/schema";
+import { type TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
+type TRPC_OK_CODE_KEY = "OK" | "CREATED" | "ACCEPTED" | "NO_CONTENT" | "RESET_CONTENT" | "PARTIAL_CONTENT";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return "";
@@ -20,57 +22,38 @@ export const PAGINATION_LIMIT = 5;
 
 export const LOCALE_TAG: undefined | string[] = [];
 
-export const ERROR_MESSAGES = {
-  PARSE_ERROR: "Error parsing the request",
-  BAD_REQUEST: "Invalid request",
-  INTERNAL_SERVER_ERROR: "Internal server error",
-  NOT_IMPLEMENTED: "Feature not implemented",
-  UNAUTHORIZED: "Unauthorized access",
-  FORBIDDEN: "Access forbidden",
-  NOT_FOUND: "Resource not found",
-  METHOD_NOT_SUPPORTED: "HTTP method not supported",
-  TIMEOUT: "Request timeout",
-  CONFLICT: "Conflict in resource state",
-  PRECONDITION_FAILED: "Precondition failed for the request",
-  PAYLOAD_TOO_LARGE: "Request payload too large",
-  UNPROCESSABLE_CONTENT: "Unprocessable request content",
-  TOO_MANY_REQUESTS: "Too many requests",
-  CLIENT_CLOSED_REQUEST: "Client closed the request",
+export const ERROR_MESSAGES: Record<TRPC_ERROR_CODE_KEY, string> = {
+  PARSE_ERROR: "Error parsing the request. Please check your request syntax.",
+  BAD_REQUEST: "Invalid request. Please provide valid request parameters.",
+  INTERNAL_SERVER_ERROR: "Internal server error. Please try again later.",
+  NOT_IMPLEMENTED: "Feature not implemented. This functionality is not available yet.",
+  UNAUTHORIZED: "Unauthorized access. Please authenticate to access this resource.",
+  FORBIDDEN: "Access forbidden. You do not have permission to access this resource.",
+  NOT_FOUND: "Resource not found. The requested resource does not exist.",
+  METHOD_NOT_SUPPORTED: "HTTP method not supported. Please use a supported HTTP method.",
+  TIMEOUT: "Request timeout. The server did not receive a timely response.",
+  CONFLICT: "Conflict in resource state. There is a conflict with the current state of the resource.",
+  PRECONDITION_FAILED: "Precondition failed for the request. Please meet the required conditions.",
+  PAYLOAD_TOO_LARGE: "Request payload too large. The size of the request payload exceeds the limit.",
+  UNPROCESSABLE_CONTENT: "Unprocessable request content. The request content is not valid or cannot be processed.",
+  TOO_MANY_REQUESTS: "Too many requests. Please try again later.",
+  CLIENT_CLOSED_REQUEST: "Client closed the request. The client terminated the request unexpectedly.",
 };
 
-export const OK_MESSAGES = {
+export const OK_MESSAGES: Record<TRPC_OK_CODE_KEY, string> = {
   OK: "OK",
   CREATED: "Resource created successfully",
   ACCEPTED: "Request accepted",
-  NO_CONTENT: "No content",
-  RESET_CONTENT: "Reset content",
-  PARTIAL_CONTENT: "Partial content",
+  NO_CONTENT: "No content available",
+  RESET_CONTENT: "Reset content successfully",
+  PARTIAL_CONTENT: "Partial content received",
 };
 
-export class THROW_ERROR {
-  static NOT_FOUND = (data: unknown) => {
-    if (!data) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: ERROR_MESSAGES.NOT_FOUND,
-      });
-    }
-  };
-  static CONFLICT = (data: unknown) => {
-    if (data) {
-      throw new TRPCError({
-        code: "CONFLICT",
-        message: ERROR_MESSAGES.CONFLICT,
-      });
-    }
-  };
-  static UNAUTHORIZED = () => {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: ERROR_MESSAGES.UNAUTHORIZED,
-    });
-  };
-}
+export const THROW_ERROR = (code: TRPC_ERROR_CODE_KEY) => {
+  throw new TRPCError({ code, message: ERROR_MESSAGES[code] });
+};
+
+export const THROW_OK = (code: TRPC_OK_CODE_KEY) => ({ message: OK_MESSAGES[code] });
 
 type A<T extends string> = T extends `${infer U}ScalarFieldEnum` ? U : never;
 type Entity = A<keyof typeof Prisma>;
