@@ -14,9 +14,7 @@ const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`;
 };
 
-export const getUrl = () => {
-  return getBaseUrl() + "/api/trpc";
-};
+export const getUrl = () => getBaseUrl() + "/api/trpc";
 
 export const PAGINATION_LIMIT = 5;
 

@@ -24,7 +24,18 @@ declare module "next-auth" {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
-
+  secret: env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      return { ...token, ...user };
+    },
+    async session({ session, token }) {
+      return { ...session, user: { ...session.user, id: token.id } };
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
@@ -51,24 +62,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  secret: env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      return { ...token, ...user };
-    },
-    async session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.id,
-        },
-      };
-    },
-  },
 };
 
 export const getServerAuthSession = () => getServerSession(authOptions);

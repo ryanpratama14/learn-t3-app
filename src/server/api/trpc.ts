@@ -6,12 +6,7 @@ import { THROW_ERROR, transformer } from "~/trpc/shared";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await getServerAuthSession();
-
-  return {
-    db,
-    session,
-    ...opts,
-  };
+  return { db, session, ...opts };
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
@@ -28,14 +23,8 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 });
 
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    return THROW_ERROR("UNAUTHORIZED");
-  }
-  return next({
-    ctx: {
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
+  if (!ctx.session || !ctx.session.user) return THROW_ERROR("UNAUTHORIZED");
+  return next({ ctx: { session: { ...ctx.session, user: ctx.session.user } } });
 });
 
 export const createTRPCRouter = t.router;
