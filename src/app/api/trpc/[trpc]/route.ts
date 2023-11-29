@@ -30,8 +30,8 @@ const handler = (req: NextRequest) =>
             consoleError("tRPC failed");
             consoleError(`path: api.${path ?? "<no-path>"}.${type}`);
             consoleError(`input: ${JSON.stringify(input) ?? null}`);
-            consoleError(`code: ${error.code}`);
-            consoleError(`message: ${error.message}`);
+            consoleError(`code: ${error?.code ?? null}`);
+            consoleError(`message: ${error?.message ?? null}`);
             consoleError(`session: ${JSON.stringify(ctx?.session?.user) ?? null}`);
           }
         : undefined,
