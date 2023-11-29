@@ -10,6 +10,10 @@ export const loadToTop = () => {
   });
 };
 
+export const cn = (...inputs: ClassValue[]): string => {
+  return twMerge(clsx(inputs));
+};
+
 export const createUrl = (pathname: string, params: URLSearchParams | ReadonlyURLSearchParams) => {
   const paramsString = params.toString();
   const queryString = `${paramsString.length ? "?" : ""}${paramsString}`;
@@ -81,9 +85,4 @@ export const formatDateLong = (date: Date): string => {
     month: "long",
     day: "numeric",
   });
-};
-
-export const cn = (...inputs: ClassValue[]): string => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-  return twMerge(clsx(inputs));
 };
