@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
           const { email, password } = parsedCredentials.data;
           const user = await db.user.findFirst({ where: { email } });
           if (!user) return null;
-          const passwordsMatch = await verify(user.password ?? "", password);
+          const passwordsMatch = await verify(user.password!, password);
           if (passwordsMatch) return user;
         }
 
