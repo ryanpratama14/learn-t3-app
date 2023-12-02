@@ -15,7 +15,6 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await signIn("credentials", { ...data, redirect: false });
-
     if (!res?.error) {
       router.refresh();
     } else {

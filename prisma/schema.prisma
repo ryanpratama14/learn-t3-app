@@ -42,6 +42,7 @@ model Document {
     id         String   @id @default(cuid())
     uploadedAt DateTime @default(now())
     url        String
+    name       String
     owner      User     @relation(fields: [ownerId], references: [id])
     ownerId    String
 }
@@ -49,6 +50,7 @@ model Document {
 model Image {
     id         String   @id @default(cuid())
     url        String
+    name       String
     uploadedAt DateTime @default(now())
     User       User[]
 }

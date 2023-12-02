@@ -21,14 +21,12 @@ export const ourFileRouter = {
   uploadUserImage: f({ image: { maxFileSize: "1MB" } })
     .middleware(async () => {
       const session = await getServerAuthSession();
-      console.log(session);
       if (!session) throw new Error("Unauthorized");
       return { userId: session.user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log(metadata, file);
-      const newData = await db.image.create({ data: { url: file.url } });
-      await db.user.update({ where: { id: metadata.userId }, data: { imageId: newData.id } });
+      const image = await db.image.create({ data: { url: file.url, name: file.name } });
+      await db.user.update({ where: { id: metadata.userId }, data: { imageId: image.id } });
       return { message: OK_MESSAGES.OK };
     }),
 } satisfies FileRouter;

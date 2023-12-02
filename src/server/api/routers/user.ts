@@ -1,19 +1,16 @@
 import { hash } from "argon2";
-import { z } from "zod";
-
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { prismaExclude, type RouterOutputs, THROW_ERROR, THROW_OK } from "~/trpc/shared";
+import { schema } from "~/server/api/schema/schema";
 
 export const userRouter = createTRPCRouter({
-  register: publicProcedure
-    .input(z.object({ email: z.string().email(), password: z.string().min(4) }))
-    .mutation(async ({ input, ctx }) => {
-      const data = await ctx.db.user.findUnique({ where: { email: input.email } });
-      if (data) THROW_ERROR("CONFLICT");
-      const hashedPassword = await hash(input.password);
-      await ctx.db.user.create({ data: { email: input.email, password: hashedPassword } });
-      return THROW_OK("CREATED");
-    }),
+  register: publicProcedure.input(schema.login).mutation(async ({ input, ctx }) => {
+    const data = await ctx.db.user.findUnique({ where: { email: input.email } });
+    if (data) THROW_ERROR("CONFLICT");
+    const hashedPassword = await hash(input.password);
+    await ctx.db.user.create({ data: { email: input.email, password: hashedPassword } });
+    return THROW_OK("CREATED");
+  }),
 
   detail: protectedProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.user.findFirst({

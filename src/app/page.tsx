@@ -14,7 +14,7 @@ export default async function Home() {
     <Fragment>
       {/* <Register /> */}
       <Login />
-      {/* <form
+      <form
         className="flex flex-col gap-2 bg-gray-100"
         action={async (formData: FormData) => {
           "use server";
@@ -26,7 +26,7 @@ export default async function Home() {
         <input className="p-2 border-2 border-gray-200 rounded-xl" name="email" type="email" required />
         <input className="p-2 border-2 border-gray-200 rounded-xl" name="password" type="password" required />
         <button type="submit">Register</button>
-      </form> */}
+      </form>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
