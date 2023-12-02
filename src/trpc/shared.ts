@@ -6,8 +6,12 @@ import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "@/server/api/root";
 import { type Pagination } from "@/server/api/schema/schema";
 import { type TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
+
 export type TRPC_OK_CODE_KEY = "OK" | "CREATED" | "ACCEPTED" | "NO_CONTENT" | "RESET_CONTENT" | "PARTIAL_CONTENT";
 export type TRPC_CODE_KEY = TRPC_OK_CODE_KEY | TRPC_ERROR_CODE_KEY;
+type A<T extends string> = T extends `${infer U}ScalarFieldEnum` ? U : never;
+type Entity = A<keyof typeof Prisma>;
+type Keys<T extends Entity> = Extract<keyof (typeof Prisma)[keyof Pick<typeof Prisma, `${T}ScalarFieldEnum`>], string>;
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return "";
@@ -73,10 +77,6 @@ export const THROW_CODE = (code: TRPC_CODE_KEY, message = true) => {
     };
   return code;
 };
-
-type A<T extends string> = T extends `${infer U}ScalarFieldEnum` ? U : never;
-type Entity = A<keyof typeof Prisma>;
-type Keys<T extends Entity> = Extract<keyof (typeof Prisma)[keyof Pick<typeof Prisma, `${T}ScalarFieldEnum`>], string>;
 
 export const prismaExclude = <T extends Entity, K extends Keys<T>>(type: T, omit: K[]) => {
   type Key = Exclude<Keys<T>, K>;
