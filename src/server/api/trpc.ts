@@ -2,7 +2,7 @@ import { initTRPC } from "@trpc/server";
 import { ZodError } from "zod";
 import { getServerAuthSession } from "@/server/auth";
 import { db } from "@/server/db";
-import { THROW_ERROR, transformer } from "@/trpc/shared";
+import { THROW_TRPC_ERROR, transformer } from "@/trpc/shared";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await getServerAuthSession();
@@ -23,7 +23,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 });
 
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) return THROW_ERROR("UNAUTHORIZED");
+  if (!ctx.session || !ctx.session.user) return THROW_TRPC_ERROR("UNAUTHORIZED");
   return next({ ctx: { session: { ...ctx.session, user: ctx.session.user } } });
 });
 
