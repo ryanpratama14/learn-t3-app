@@ -7,6 +7,7 @@ import { type AppRouter } from "@/server/api/root";
 import { type Pagination } from "@/server/api/schema/schema";
 import { type TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
 export type TRPC_OK_CODE_KEY = "OK" | "CREATED" | "ACCEPTED" | "NO_CONTENT" | "RESET_CONTENT" | "PARTIAL_CONTENT";
+export type TRPC_CODE_KEY = TRPC_OK_CODE_KEY | TRPC_ERROR_CODE_KEY;
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return "";
@@ -52,6 +53,16 @@ export const THROW_ERROR = (code: TRPC_ERROR_CODE_KEY) => {
 };
 
 export const THROW_OK = (code: TRPC_OK_CODE_KEY) => ({ code, message: OK_MESSAGES[code] });
+
+export const THROW_CODE = (code: TRPC_CODE_KEY) => code;
+
+export const THROW_CODE_WITH_MESSAGE = (code: TRPC_CODE_KEY) => ({
+  code,
+  message:
+    code in OK_MESSAGES
+      ? (OK_MESSAGES as Record<TRPC_CODE_KEY, string>)[code]
+      : (ERROR_MESSAGES as Record<TRPC_CODE_KEY, string>)[code],
+});
 
 type A<T extends string> = T extends `${infer U}ScalarFieldEnum` ? U : never;
 type Entity = A<keyof typeof Prisma>;
