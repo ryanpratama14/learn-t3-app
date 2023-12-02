@@ -3,9 +3,9 @@ import { getServerSession, type DefaultSession, type NextAuthOptions } from "nex
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { verify } from "argon2";
-import { env } from "~/env";
-import { db } from "~/server/db";
-import { schema } from "~/server/api/schema/schema";
+import { env } from "@/env";
+import { db } from "@/server/db";
+import { schema } from "@/server/api/schema/schema";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {

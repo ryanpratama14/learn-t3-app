@@ -4,8 +4,8 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
-import { UploadButton } from "~/lib/uploadthing";
-import { api } from "~/trpc/react";
+import { UploadButton } from "@/lib/uploadthing";
+import { api } from "@/trpc/react";
 
 export default function Login() {
   const router = useRouter();

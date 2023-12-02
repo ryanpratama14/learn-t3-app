@@ -3,8 +3,8 @@ import SuperJSON from "superjson";
 import { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
-import { type AppRouter } from "~/server/api/root";
-import { type Pagination } from "~/server/api/schema/schema";
+import { type AppRouter } from "@/server/api/root";
+import { type Pagination } from "@/server/api/schema/schema";
 import { type TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
 type TRPC_OK_CODE_KEY = "OK" | "CREATED" | "ACCEPTED" | "NO_CONTENT" | "RESET_CONTENT" | "PARTIAL_CONTENT";
 
@@ -14,7 +14,7 @@ const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`;
 };
 
-export const getUrl = () => getBaseUrl() + "/api/trpc";
+export const getUrl = () => `${getBaseUrl()}/api/trpc`;
 
 export const PAGINATION_LIMIT = 5;
 
@@ -147,7 +147,7 @@ export const getPagination = ({ limit = PAGINATION_LIMIT, page }: Pagination) =>
   return { skip: (page - 1) * limit, take: limit };
 };
 
-export const getPaginationData = (totalData: number, limit: number = PAGINATION_LIMIT, page: number) => {
+export const getPaginationData = ({ totalData, limit = PAGINATION_LIMIT, page }: Pagination & { totalData: number }) => {
   const totalPages = Math.ceil(totalData / limit) || 1;
   const start = (page - 1) * limit;
   const end = start + limit;

@@ -7,9 +7,9 @@ import { type TRPCErrorResponse } from "@trpc/server/rpc";
 import { cookies } from "next/headers";
 import { cache } from "react";
 
-import { appRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
-import { transformer } from "~/trpc/shared";
+import { appRouter } from "@/server/api/root";
+import { createTRPCContext } from "@/server/api/trpc";
+import { transformer } from "@/trpc/shared";
 
 const createContext = cache(() => {
   return createTRPCContext({

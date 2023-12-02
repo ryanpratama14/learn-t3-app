@@ -1,21 +1,14 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { type NextRequest } from "next/server";
-
-import { env } from "~/env";
-import { appRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
-import { LOCALE_TAG } from "~/trpc/shared";
+import { env } from "@/env";
+import { appRouter } from "@/server/api/root";
+import { createTRPCContext } from "@/server/api/trpc";
+import { consoleError } from "@/lib/utils";
 
 const createContext = async (req: NextRequest) => {
   return createTRPCContext({
     headers: req.headers,
   });
-};
-
-const consoleError = (error: string) => {
-  console.error(
-    `❌ ${new Date().toLocaleTimeString(LOCALE_TAG, { hour: "2-digit", minute: "2-digit", second: "2-digit" })} 👉 ${error}`
-  );
 };
 
 const handler = (req: NextRequest) =>

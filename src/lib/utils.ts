@@ -1,7 +1,7 @@
 import { type ReadonlyURLSearchParams } from "next/navigation";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { LOCALE_TAG } from "~/trpc/shared";
+import { LOCALE_TAG } from "@/trpc/shared";
 
 export const loadToTop = () => {
   window.scrollTo({
@@ -14,6 +14,12 @@ export const cn = (...inputs: ClassValue[]): string => {
   return twMerge(clsx(inputs));
 };
 
+export const consoleError = (error: string) => {
+  console.error(
+    `❌ ${new Date().toLocaleTimeString(LOCALE_TAG, { hour: "2-digit", minute: "2-digit", second: "2-digit" })} 👉 ${error}`
+  );
+};
+
 export const createUrl = (pathname: string, params: URLSearchParams | ReadonlyURLSearchParams) => {
   const paramsString = params.toString();
   const queryString = `${paramsString.length ? "?" : ""}${paramsString}`;
@@ -21,20 +27,19 @@ export const createUrl = (pathname: string, params: URLSearchParams | ReadonlyUR
 };
 
 export const createSearchParams = (
-  // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-  params: { [key: string]: string | string[] },
+  params: Record<string, string | string[]>,
   newParams?: URLSearchParams
 ): URLSearchParams => {
   const updatedParams = new URLSearchParams(newParams);
-  Object.entries(params).forEach(([key, values]) => {
+  for (const [key, values] of Object.entries(params)) {
     if (Array.isArray(values)) {
-      values.forEach((value) => {
+      for (const value of values) {
         updatedParams.append(key, value);
-      });
+      }
     } else {
       updatedParams.append(key, values);
     }
-  });
+  }
   return updatedParams;
 };
 

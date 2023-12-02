@@ -1,32 +1,26 @@
 import Link from "next/link";
 import { Fragment } from "react";
-import { getServerAuthSession } from "~/server/auth";
-import { api } from "~/trpc/server";
-// import Register from "./_components/register";
+import { getServerAuthSession } from "@/server/auth";
+import { api } from "@/trpc/server";
 import Login from "./_components/login";
 import Image from "next/image";
+import Register from "./_components/Register";
 
 export default async function Home() {
   const session = await getServerAuthSession();
   const data = session ? await api.user.detail.query() : undefined;
 
+  const createUser = async (formData: FormData) => {
+    "use server";
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    await api.user.register.mutate({ email, password });
+  };
+
   return (
     <Fragment>
-      {/* <Register /> */}
       <Login />
-      <form
-        className="flex flex-col gap-2 bg-gray-100"
-        action={async (formData: FormData) => {
-          "use server";
-          const email = formData.get("email") as string;
-          const password = formData.get("password") as string;
-          return await api.user.register.mutate({ email, password });
-        }}
-      >
-        <input className="p-2 border-2 border-gray-200 rounded-xl" name="email" type="email" required />
-        <input className="p-2 border-2 border-gray-200 rounded-xl" name="password" type="password" required />
-        <button type="submit">Register</button>
-      </form>
+      <Register createUser={createUser} />
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">

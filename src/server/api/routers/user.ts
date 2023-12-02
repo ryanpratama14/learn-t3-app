@@ -1,7 +1,7 @@
 import { hash } from "argon2";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-import { prismaExclude, type RouterOutputs, THROW_ERROR, THROW_OK } from "~/trpc/shared";
-import { schema } from "~/server/api/schema/schema";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { prismaExclude, type RouterOutputs, THROW_ERROR, THROW_OK } from "@/trpc/shared";
+import { schema } from "@/server/api/schema/schema";
 
 export const userRouter = createTRPCRouter({
   register: publicProcedure.input(schema.login).mutation(async ({ input, ctx }) => {
