@@ -6,21 +6,22 @@ import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { UploadButton } from "@/lib/uploadthing";
 import { api } from "@/trpc/react";
+import { type Login } from "@/server/api/schema/schema";
 
 export default function Login() {
   const router = useRouter();
-  const [data, setData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<Login>({ email: "", password: "" });
+
+  const handleChange = (name: keyof Login) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await signIn("credentials", { ...data, redirect: false });
     if (!res?.error) return router.refresh();
     alert("Username or password incorrect");
-  };
-
-  const handleChange = (name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [name]: e.target.value });
   };
 
   const { data: user, isLoading } = api.user.detail.useQuery();

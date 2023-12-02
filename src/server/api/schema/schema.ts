@@ -1,8 +1,6 @@
 import { z } from "zod";
-// import { getEnumKeys } from "@/helper/utils";
 
 const pagination = z.object({ page: z.number().min(1), limit: z.number().min(1).optional() });
-
 const order = z.enum(["asc", "desc"]).optional();
 
 export class schema {
@@ -58,4 +56,4 @@ export class schema {
 }
 
 export type Pagination = z.infer<typeof pagination>;
-// export const UserKeys = getEnumKeys(UserModel.shape);
+export type Login = z.infer<typeof schema.login>;

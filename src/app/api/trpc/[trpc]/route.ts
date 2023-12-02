@@ -5,11 +5,7 @@ import { appRouter } from "@/server/api/root";
 import { createTRPCContext } from "@/server/api/trpc";
 import { consoleError } from "@/lib/utils";
 
-const createContext = async (req: NextRequest) => {
-  return createTRPCContext({
-    headers: req.headers,
-  });
-};
+const createContext = async (req: NextRequest) => createTRPCContext({ headers: req.headers });
 
 const handler = (req: NextRequest) =>
   fetchRequestHandler({

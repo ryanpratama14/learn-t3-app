@@ -10,9 +10,7 @@ export const loadToTop = () => {
   });
 };
 
-export const cn = (...inputs: ClassValue[]): string => {
-  return twMerge(clsx(inputs));
-};
+export const cn = (...inputs: ClassValue[]): string => twMerge(clsx(inputs));
 
 export const consoleError = (error: string) => {
   console.error(

@@ -21,10 +21,10 @@ export const PAGINATION_LIMIT = 5;
 export const LOCALE_TAG: undefined | string[] = [];
 
 export const ERROR_MESSAGES: Record<TRPC_ERROR_CODE_KEY, string> = {
-  PARSE_ERROR: "Error parsing the request. Please check your request syntax.",
+  PARSE_ERROR: "Error parsing the request. Please check the syntax of your request.",
   BAD_REQUEST: "Invalid request. Please provide valid request parameters.",
   INTERNAL_SERVER_ERROR: "Internal server error. Please try again later.",
-  NOT_IMPLEMENTED: "Feature not implemented. This functionality is not available yet.",
+  NOT_IMPLEMENTED: "Feature not implemented. This functionality is currently unavailable.",
   UNAUTHORIZED: "Unauthorized access. Please authenticate to access this resource.",
   FORBIDDEN: "Access forbidden. You do not have permission to access this resource.",
   NOT_FOUND: "Resource not found. The requested resource does not exist.",
@@ -40,11 +40,11 @@ export const ERROR_MESSAGES: Record<TRPC_ERROR_CODE_KEY, string> = {
 
 export const OK_MESSAGES: Record<TRPC_OK_CODE_KEY, string> = {
   OK: "OK",
-  CREATED: "Resource created successfully",
-  ACCEPTED: "Request accepted",
-  NO_CONTENT: "No content available",
-  RESET_CONTENT: "Reset content successfully",
-  PARTIAL_CONTENT: "Partial content received",
+  CREATED: "Resource created successfully.",
+  ACCEPTED: "Request accepted.",
+  NO_CONTENT: "No content available.",
+  RESET_CONTENT: "Reset content successful.",
+  PARTIAL_CONTENT: "Partial content received successfully.",
 };
 
 export const THROW_ERROR = (code: TRPC_ERROR_CODE_KEY) => {
