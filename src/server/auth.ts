@@ -44,10 +44,7 @@ export const authOptions: NextAuthOptions = {
     }),
     CredentialsProvider({
       name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "text", placeholder: "jsmith" },
-        password: { label: "Password", type: "password" },
-      },
+      credentials: {},
       async authorize(credentials) {
         const parsedCredentials = schema.login.safeParse(credentials);
 

@@ -2,7 +2,7 @@ import { hash } from "argon2";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-import { prismaExclude, THROW_ERROR, THROW_OK } from "~/trpc/shared";
+import { prismaExclude, type RouterOutputs, THROW_ERROR, THROW_OK } from "~/trpc/shared";
 
 export const userRouter = createTRPCRouter({
   register: publicProcedure
@@ -18,7 +18,7 @@ export const userRouter = createTRPCRouter({
   detail: protectedProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.user.findFirst({
       where: { id: ctx.session.user.id },
-      select: prismaExclude("User", ["password"]),
+      select: { image: true, ...prismaExclude("User", ["password"]) },
     });
     if (!data) THROW_ERROR("NOT_FOUND");
     return data;
@@ -28,3 +28,6 @@ export const userRouter = createTRPCRouter({
 
   secretMessage: publicProcedure.query(() => ({ message: "Secret message" })),
 });
+
+// outputs
+export type User = RouterOutputs["user"]["detail"];

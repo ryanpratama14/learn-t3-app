@@ -4,9 +4,11 @@ import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 // import Register from "./_components/register";
 import Login from "./_components/login";
+import Image from "next/image";
 
 export default async function Home() {
   const session = await getServerAuthSession();
+  const data = session ? await api.user.detail.query() : undefined;
 
   return (
     <Fragment>
@@ -59,6 +61,15 @@ export default async function Home() {
               >
                 {session ? "Sign out" : "Sign in"}
               </Link>
+              {data?.image ? (
+                <Image
+                  alt="Profile Picture"
+                  src={data.image.url}
+                  width={1000}
+                  height={1000}
+                  className="w-24 aspect-square object-cover"
+                />
+              ) : null}
             </div>
           </div>
         </div>

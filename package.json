@@ -21,6 +21,7 @@
     "@trpc/next": "^10.44.1",
     "@trpc/react-query": "^10.44.1",
     "@trpc/server": "^10.44.1",
+    "@uploadthing/react": "^6.0.2",
     "argon2": "^0.31.2",
     "clsx": "^2.0.0",
     "next": "^14.0.3",
@@ -30,6 +31,7 @@
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
     "tailwind-merge": "^2.0.0",
+    "uploadthing": "^6.0.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {

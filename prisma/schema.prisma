@@ -27,13 +27,30 @@ model Account {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String     @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?    @unique
     emailVerified DateTime?
-    image         String?
     password      String?
     accounts      Account[]
+    image         Image?     @relation(fields: [imageId], references: [id])
+    imageId       String?
+    documents     Document[]
+}
+
+model Document {
+    id         String   @id @default(cuid())
+    uploadedAt DateTime @default(now())
+    url        String
+    owner      User     @relation(fields: [ownerId], references: [id])
+    ownerId    String
+}
+
+model Image {
+    id         String   @id @default(cuid())
+    url        String
+    uploadedAt DateTime @default(now())
+    User       User[]
 }
 
 model VerificationToken {
