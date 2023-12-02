@@ -1,10 +1,7 @@
 import { z } from "zod";
 // import { getEnumKeys } from "@/helper/utils";
 
-const pagination = z.object({
-  page: z.number().min(1),
-  limit: z.number().min(1).optional(),
-});
+const pagination = z.object({ page: z.number().min(1), limit: z.number().min(1).optional() });
 
 const order = z.enum(["asc", "desc"]).optional();
 
@@ -20,11 +17,7 @@ export class schema {
           email: order,
           registeredAt: order,
           updatedAt: order,
-          position: z
-            .object({
-              name: order,
-            })
-            .optional(),
+          position: z.object({ name: order }).optional(),
         }),
       })
     );
@@ -52,37 +45,15 @@ export class schema {
       graduatedDate: z.string(),
     });
 
-    static detail = z.object({
-      id: z.string(),
-    });
-
-    static update = z.object({
-      id: this.detail.shape.id,
-      body: this.create,
-    });
+    static detail = z.object({ id: z.string() });
+    static update = z.object({ id: this.detail.shape.id, body: this.create });
   };
 
   static position = class {
-    static list = z
-      .object({
-        params: z.object({
-          search: z.string().optional(),
-        }),
-      })
-      .optional();
-
-    static create = z.object({
-      name: z.string().min(1),
-    });
-
-    static detail = z.object({
-      id: z.string(),
-    });
-
-    static update = z.object({
-      id: this.detail.shape.id,
-      body: this.create,
-    });
+    static list = z.object({ params: z.object({ search: z.string().optional() }) }).optional();
+    static create = z.object({ name: z.string().min(1) });
+    static detail = z.object({ id: z.string() });
+    static update = z.object({ id: this.detail.shape.id, body: this.create });
   };
 }
 

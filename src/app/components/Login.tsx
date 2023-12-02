@@ -15,11 +15,8 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await signIn("credentials", { ...data, redirect: false });
-    if (!res?.error) {
-      router.refresh();
-    } else {
-      alert("Username or password incorrect");
-    }
+    if (!res?.error) return router.refresh();
+    alert("Username or password incorrect");
   };
 
   const handleChange = (name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -24,6 +24,7 @@ export default function Register({ createUser }: Props) {
       <input className="p-2 border-2 border-gray-200 rounded-xl" name="email" type="email" required />
       <input className="p-2 border-2 border-gray-200 rounded-xl" name="password" type="password" required />
       <button
+        disabled={pending}
         type="submit"
         className={cn("p-2 bg-green-500 hover:bg-green-600 transition-all", {
           "bg-gray-600": pending,

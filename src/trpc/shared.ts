@@ -6,7 +6,7 @@ import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "@/server/api/root";
 import { type Pagination } from "@/server/api/schema/schema";
 import { type TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
-type TRPC_OK_CODE_KEY = "OK" | "CREATED" | "ACCEPTED" | "NO_CONTENT" | "RESET_CONTENT" | "PARTIAL_CONTENT";
+export type TRPC_OK_CODE_KEY = "OK" | "CREATED" | "ACCEPTED" | "NO_CONTENT" | "RESET_CONTENT" | "PARTIAL_CONTENT";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return "";

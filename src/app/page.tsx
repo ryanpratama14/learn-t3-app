@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { Fragment } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { getServerAuthSession } from "@/server/auth";
 import { api } from "@/trpc/server";
-import Login from "./_components/login";
-import Image from "next/image";
-import Register from "./_components/Register";
+import Login from "@/app/components/Login";
+import Register from "@/app/components/Register";
 
 export default async function Home() {
   const session = await getServerAuthSession();
