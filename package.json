@@ -6,7 +6,7 @@
   "scripts": {
     "build": "next build",
     "dbpush": "prisma db push",
-    "studio": "prisma studio",
+    "table": "prisma studio",
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",

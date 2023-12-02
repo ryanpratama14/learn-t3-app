@@ -28,32 +28,34 @@ model Account {
 
 model User {
     id            String     @id @default(cuid())
+    createdAt     DateTime   @default(now())
     name          String?
     email         String?    @unique
     emailVerified DateTime?
     password      String?
     accounts      Account[]
-    image         Image?     @relation(fields: [imageId], references: [id])
-    imageId       String?
     documents     Document[]
+    image         Document?  @relation("userImage", fields: [imageId], references: [id])
+    imageId       String?    @unique
 }
 
 model Document {
     id         String   @id @default(cuid())
-    uploadedAt DateTime @default(now())
     url        String
     name       String
     owner      User     @relation(fields: [ownerId], references: [id])
     ownerId    String
+    imageOwner User?    @relation("userImage")
+    createdAt  DateTime @default(now())
 }
 
-model Image {
-    id         String   @id @default(cuid())
-    url        String
-    name       String
-    uploadedAt DateTime @default(now())
-    User       User[]
-}
+// model Image {
+//     id         String   @id @default(cuid())
+//     url        String
+//     name       String
+//     uploadedAt DateTime @default(now())
+//     User       User[]
+// }
 
 model VerificationToken {
     identifier String
