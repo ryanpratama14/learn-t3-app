@@ -8,7 +8,7 @@ import React, { useState } from "react";
 
 export default function MultiUploader() {
   const [loading, setLoading] = useState(false);
-  const { data: user, isLoading } = api.user.detail.useQuery();
+  const { data: user, isFetching } = api.user.detail.useQuery();
   const utils = api.useUtils();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,6 +21,7 @@ export default function MultiUploader() {
         setLoading(false);
       } catch (error) {
         console.log(error);
+        alert("Can't upload, please try again");
         setLoading(false);
       }
     } else alert("Under 1MB plz");
@@ -34,7 +35,7 @@ export default function MultiUploader() {
         className="cursor-pointer absolute w-full h-full opacity-0 top-0 z-10"
         onChange={handleFileChange}
       />
-      {user?.image?.url && !loading && !isLoading && (
+      {user?.image?.url && !loading && !isFetching && (
         <Image
           alt="Profile Picture"
           src={user.image.url}
