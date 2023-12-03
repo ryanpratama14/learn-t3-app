@@ -5,6 +5,7 @@ import { getServerAuthSession } from "@/server/auth";
 import { api } from "@/trpc/server";
 import Login from "@/app/components/Login";
 import Register from "@/app/components/Register";
+import MultiUploader from "@/app/components/MultiUploader";
 
 export default async function Home() {
   const session = await getServerAuthSession();
@@ -19,8 +20,10 @@ export default async function Home() {
 
   return (
     <Fragment>
+      <MultiUploader />
       <Login />
       <Register createUser={createUser} />
+
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
