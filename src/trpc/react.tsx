@@ -21,12 +21,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode; cookies: s
         }),
         unstable_httpBatchStreamLink({
           url: getUrl(),
-          headers() {
-            return {
-              cookie: props.cookies,
-              "x-trpc-source": "react",
-            };
-          },
+          headers: () => ({ cookie: props.cookies, "x-trpc-source": "react" }),
         }),
       ],
     })
