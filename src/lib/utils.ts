@@ -78,7 +78,7 @@ export const getEndDate = (date: string): string => {
   return updatedDate.toISOString();
 };
 
-export const getDateExpiry = (): Date => {
+export const getExpiryDate = (): Date => {
   const currentDate = new Date();
   const millisecondsToAdd = 3600000; // 1 hour
   return new Date(currentDate.getTime() + millisecondsToAdd);

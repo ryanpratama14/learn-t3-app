@@ -32,20 +32,20 @@ model Account {
 }
 
 model User {
-    id            String     @id @default(cuid())
-    createdAt     DateTime   @default(now())
-    name          String?
-    email         String?    @unique
-    emailVerified DateTime?
-    password      String?
-    accounts      Account[]
-    documents     Document[]
-    image         Document?  @relation("userImage", fields: [imageId], references: [id])
-    imageId       String?    @unique
-
-    verifyToken               String?   @unique
+    id                        String     @id @default(cuid())
+    createdAt                 DateTime   @default(now())
+    name                      String?
+    email                     String?    @unique
+    emailVerified             DateTime?
+    password                  String?
+    passwordChanged           DateTime   @default(now())
+    accounts                  Account[]
+    documents                 Document[]
+    image                     Document?  @relation("userImage", fields: [imageId], references: [id])
+    imageId                   String?    @unique
+    verifyToken               String?    @unique
     verifyTokenExpiry         DateTime?
-    forgotPasswordToken       String?   @unique
+    forgotPasswordToken       String?    @unique
     forgotPasswordTokenExpiry DateTime?
 }
 

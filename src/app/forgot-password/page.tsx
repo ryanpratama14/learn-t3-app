@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 type Data = {
@@ -13,12 +13,11 @@ export default function ForgotPassword() {
   const searchParams = useSearchParams();
   const newParams = new URLSearchParams(searchParams.toString());
 
-  const token = newParams.get("token")!.replace(" ", "+");
-  if (!token) redirect("/");
+  const token = newParams.get("token")?.replace(" ", "+");
+  if (!token) return redirect("/");
 
   const { data: isExpired } = api.user.isForgotPasswordTokenExpired.useQuery({ token });
-  console.log(isExpired);
-  if (isExpired) redirect("/expired-link");
+  if (isExpired) return redirect("/expired-link");
 
   const [data, setData] = useState<Data>({
     password: "",
@@ -29,12 +28,20 @@ export default function ForgotPassword() {
     setData({ ...data, [name]: e.target.value });
   };
 
-  const { mutate: updatePassword } = api.user.updatePassword.useMutation();
+  const { mutate: updatePassword } = api.user.updatePassword.useMutation({
+    onSuccess: () => {
+      alert("Password changed");
+      redirect("/");
+    },
+    onError: (error) => {
+      console.log(error.message);
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (data.password !== data.confirmPassword) return alert("Password doesn't match");
-    updatePassword({ token, newPassword: data.password }, { onSuccess: () => alert("Password changed") });
+    updatePassword({ token, newPassword: data.password });
   };
 
   return (

@@ -6,6 +6,7 @@ import { createTRPCReact } from "@trpc/react-query";
 import { useState } from "react";
 import { type AppRouter } from "@/server/api/root";
 import { getUrl, transformer } from "@/trpc/shared";
+import { SessionProvider } from "next-auth/react";
 
 export const api = createTRPCReact<AppRouter>();
 
@@ -30,7 +31,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode; cookies: s
   return (
     <QueryClientProvider client={queryClient}>
       <api.Provider client={trpcClient} queryClient={queryClient}>
-        {props.children}
+        <SessionProvider>{props.children}</SessionProvider>
       </api.Provider>
     </QueryClientProvider>
   );

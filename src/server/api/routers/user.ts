@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 import { prismaExclude, type RouterOutputs, THROW_TRPC_ERROR, THROW_OK } from "@/trpc/shared";
 import { schema } from "@/server/api/schema/schema";
 import { z } from "zod";
-import { getDateExpiry } from "@/lib/utils";
+import { getExpiryDate, getNewDate } from "@/lib/utils";
 import { env } from "@/env";
 
 export const userRouter = createTRPCRouter({
@@ -20,7 +20,7 @@ export const userRouter = createTRPCRouter({
       where: { id: ctx.session.user.id },
       select: { image: true, ...prismaExclude("User", ["password"]) },
     });
-    if (!data) THROW_TRPC_ERROR("NOT_FOUND");
+    if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
     return data;
   }),
 
@@ -30,7 +30,7 @@ export const userRouter = createTRPCRouter({
     const hashedToken = await hash(data.id);
     const { email } = await ctx.db.user.update({
       where: { id: data.id },
-      data: { forgotPasswordToken: hashedToken, forgotPasswordTokenExpiry: getDateExpiry() },
+      data: { forgotPasswordToken: hashedToken, forgotPasswordTokenExpiry: getExpiryDate() },
     });
     await fetch(`${env.NEXTAUTH_URL}/api/send`, {
       method: "POST",
@@ -42,7 +42,7 @@ export const userRouter = createTRPCRouter({
 
   isForgotPasswordTokenExpired: publicProcedure.input(z.object({ token: z.string() })).query(async ({ ctx, input }) => {
     const data = await ctx.db.user.findUnique({ where: { forgotPasswordToken: input.token } });
-    if (!data?.forgotPasswordTokenExpiry || data.forgotPasswordTokenExpiry < new Date()) return true;
+    if (!data?.forgotPasswordTokenExpiry || data.forgotPasswordTokenExpiry < getNewDate()) return true;
     return false;
   }),
 
@@ -52,13 +52,14 @@ export const userRouter = createTRPCRouter({
       const hashedPassword = await hash(input.newPassword);
       const data = await ctx.db.user.update({
         where: { forgotPasswordToken: input.token },
-        data: { password: hashedPassword },
+        data: {
+          password: hashedPassword,
+          forgotPasswordToken: null,
+          forgotPasswordTokenExpiry: null,
+          passwordChanged: getNewDate(),
+        },
       });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
-      await ctx.db.user.update({
-        where: { forgotPasswordToken: input.token },
-        data: { forgotPasswordToken: null, forgotPasswordTokenExpiry: null },
-      });
       return THROW_OK("ACCEPTED");
     }),
 
