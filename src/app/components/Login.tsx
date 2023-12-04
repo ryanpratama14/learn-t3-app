@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { type Login } from "@/server/api/schema/schema";
+import { api } from "@/trpc/react";
 
 export default function Login() {
   const router = useRouter();
@@ -20,8 +21,18 @@ export default function Login() {
     alert("Username or password incorrect");
   };
 
+  const { mutate: sendLink } = api.user.forgotPassword.useMutation();
+
   return (
     <Fragment>
+      <button
+        onClick={() =>
+          sendLink({ email: "ru.ryanpratama@gmail.com" }, { onSuccess: () => alert("Password reset link sent") })
+        }
+        type="button"
+      >
+        I forgot my password
+      </button>
       <form className="flex flex-col gap-2 bg-gray-100" onSubmit={handleSubmit}>
         <input onChange={handleChange("email")} className="p-2 border-2 border-gray-200 rounded-xl" type="email" required />
         <input
