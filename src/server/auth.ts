@@ -30,12 +30,8 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
-      return { ...token, ...user };
-    },
-    async session({ session, token }) {
-      return { ...session, user: { ...session.user, id: token.id } };
-    },
+    jwt: async ({ token, user }) => ({ ...token, ...user }),
+    session: async ({ session, token }) => ({ ...session, user: { ...session.user, id: token.id } }),
   },
   providers: [
     GoogleProvider({
