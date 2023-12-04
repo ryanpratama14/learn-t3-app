@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from "@/env";
 import { uploadFiles } from "@/lib/uploadthing";
 import { isFileSizeAllowed } from "@/lib/utils";
 import { api } from "@/trpc/react";
@@ -20,7 +21,7 @@ export default function MultiUploader() {
         await utils.user.invalidate();
         setLoading(false);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         alert("Can't upload, please try again");
         setLoading(false);
       }

@@ -32,6 +32,25 @@ export default function Login() {
         />
         <button type="submit">Login</button>
       </form>
+      <button
+        type="button"
+        onClick={async () => {
+          try {
+            const res = await fetch(`/api/send`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: "ryanpratama.dev@gmail.com" }),
+            });
+            alert("Email sent");
+            console.log(res.json());
+          } catch (error) {
+            alert("Error occured, can't send email");
+            console.log(error);
+          }
+        }}
+      >
+        Send Email
+      </button>
     </Fragment>
   );
 }
