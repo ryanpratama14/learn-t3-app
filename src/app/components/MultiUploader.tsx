@@ -1,6 +1,5 @@
 "use client";
 
-import { env } from "@/env";
 import { uploadFiles } from "@/lib/uploadthing";
 import { isFileSizeAllowed } from "@/lib/utils";
 import { api } from "@/trpc/react";
@@ -17,7 +16,7 @@ export default function MultiUploader() {
     if (file && isFileSizeAllowed("1MB", file.size)) {
       try {
         setLoading(true);
-        await uploadFiles("uploadUserImage", { files: [file] });
+        await uploadFiles("uploadUserImage", { files: [file], input: { type: "profile-picture" } });
         await utils.user.invalidate();
         setLoading(false);
       } catch (error) {

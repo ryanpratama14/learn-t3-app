@@ -1,5 +1,6 @@
 import VercelInviteUserEmail from "@/emails/welcome";
 import { env } from "@/env";
+import { getServerAuthSession } from "@/server/auth";
 import { type NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
@@ -8,6 +9,9 @@ const resend = new Resend(env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerAuthSession();
+    if (!session) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const body = await req.json();
     const validation = z.object({ email: z.string().email() }).safeParse(body);

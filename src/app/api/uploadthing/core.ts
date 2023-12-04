@@ -2,11 +2,13 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { getServerAuthSession } from "@/server/auth";
 import { db } from "@/server/db";
 import { THROW_OK } from "@/trpc/shared";
+import { z } from "zod";
 
 const f = createUploadthing();
 
 export const ourFileRouter = {
   uploadUserImage: f({ image: { maxFileSize: "1MB" } })
+    .input(z.object({ type: z.enum(["profile-picture"]) }))
     .middleware(async () => {
       const session = await getServerAuthSession();
       if (!session) throw new Error("UNAUTHORIZED");
