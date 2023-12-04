@@ -13,7 +13,7 @@ export default function ForgotPassword() {
   const searchParams = useSearchParams();
   const newParams = new URLSearchParams(searchParams.toString());
 
-  const token = newParams.get("token")?.replace(" ", "+");
+  const token = newParams.get("token");
   if (!token) return redirect("/");
 
   const { data: isExpired } = api.user.isForgotPasswordTokenExpired.useQuery({ token });

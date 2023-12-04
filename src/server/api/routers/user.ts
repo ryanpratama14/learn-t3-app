@@ -27,7 +27,7 @@ export const userRouter = createTRPCRouter({
   forgotPassword: publicProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ ctx, input }) => {
     const data = await ctx.db.user.findFirst({ where: { email: input.email } });
     if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
-    const hashedToken = await hash(data.id);
+    const hashedToken = (await hash(data.id)).replace(/\+/g, "");
     const { email } = await ctx.db.user.update({
       where: { id: data.id },
       data: { forgotPasswordToken: hashedToken, forgotPasswordTokenExpiry: getExpiryDate() },
@@ -47,7 +47,7 @@ export const userRouter = createTRPCRouter({
   }),
 
   updatePassword: publicProcedure
-    .input(z.object({ token: z.string(), newPassword: z.string() }))
+    .input(z.object({ token: z.string(), newPassword: z.string().min(6) }))
     .mutation(async ({ input, ctx }) => {
       const hashedPassword = await hash(input.newPassword);
       const data = await ctx.db.user.update({
