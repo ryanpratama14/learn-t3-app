@@ -26,9 +26,7 @@ export const authOptions: NextAuthOptions = {
   pages: { signIn: "/" },
   adapter: PrismaAdapter(db),
   secret: env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-  },
+  session: { strategy: "jwt" },
   callbacks: {
     jwt: async ({ token, user }) => ({ ...token, ...user }),
     session: async ({ session, token }) => ({ ...session, user: { ...session.user, id: token.id } }),
