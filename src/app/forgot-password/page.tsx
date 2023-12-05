@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect, useSearchParams, notFound } from "next/navigation";
 import React, { useState } from "react";
 
 type Data = {
@@ -14,10 +14,10 @@ export default function ForgotPassword() {
   const newParams = new URLSearchParams(searchParams.toString());
 
   const token = newParams.get("token");
-  if (!token) return redirect("/");
+  if (!token) return notFound();
 
-  const { data: isExpired } = api.user.isForgotPasswordTokenExpired.useQuery({ token });
-  if (isExpired) return redirect("/expired-link");
+  const isTokenValid = api.user.isTokenValid.useQuery({ token });
+  if (isTokenValid) return redirect("/expired-link");
 
   const [data, setData] = useState<Data>({
     password: "",

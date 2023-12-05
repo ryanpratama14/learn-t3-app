@@ -1,27 +1,30 @@
 import { z } from "zod";
 
-const pagination = z.object({ page: z.number().min(1), limit: z.number().min(1).optional() });
-const order = z.enum(["asc", "desc"]).optional();
-
 export class schema {
-  static login = z.object({ email: z.string().email(), password: z.string().min(6) });
+  static email = z.enum(["VERIFY", "FORGOT_PASSWORD"]);
+  static order = z.enum(["asc", "desc"]).optional();
+  static pagination = z.object({ page: z.number().min(1), limit: z.number().min(1).optional() });
+  static password = z.string().min(6);
+  static login = z.object({ email: z.string().email(), password: this.password });
+  static register = z.object({ email: z.string().email(), password: this.password });
+
   static user = class {
     static sorting = z.array(
       z.object({
         title: z.string(),
         slug: z.string(),
         value: z.object({
-          name: order,
-          email: order,
-          registeredAt: order,
-          updatedAt: order,
-          position: z.object({ name: order }).optional(),
+          name: schema.order,
+          email: schema.order,
+          registeredAt: schema.order,
+          updatedAt: schema.order,
+          position: z.object({ name: schema.order }).optional(),
         }),
       })
     );
 
     static list = z.object({
-      pagination,
+      pagination: schema.pagination,
       sorting: this.sorting,
       params: z
         .object({
@@ -55,5 +58,7 @@ export class schema {
   };
 }
 
-export type Pagination = z.infer<typeof pagination>;
+export type Pagination = z.infer<typeof schema.pagination>;
 export type Login = z.infer<typeof schema.login>;
+export type Email = z.infer<typeof schema.email>;
+export type Register = z.infer<typeof schema.register>;
