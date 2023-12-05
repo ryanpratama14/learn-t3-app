@@ -25,7 +25,7 @@ export default function Login() {
     setData(initialData);
   };
 
-  const { mutate: sendToken } = api.user.sendForgotPassword.useMutation({
+  const { mutate: sendToken } = api.user.sendForgotPasswordEmail.useMutation({
     onSuccess: () => alert("Password reset link sent"),
     onError: (error) => alert(error.message),
   });

@@ -29,23 +29,6 @@ export const userRouter = createTRPCRouter({
     return false;
   }),
 
-  sendVerifyEmail: protectedProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ ctx, input }) => {
-    const data = await ctx.db.user.findUnique({ where: { email: input.email } });
-    if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
-    if (data.emailVerified) return THROW_TRPC_ERROR("CONFLICT");
-
-    const hashedToken = (await hash(data.id)).replace(/\+/g, "");
-    await ctx.db.token.create({ data: { token: hashedToken, expiryAt: getExpiryDate(), userId: data.id } });
-
-    const type: Email = "VERIFY";
-    await fetch(`${env.NEXTAUTH_URL}/api/send`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: data.email, token: hashedToken, type }),
-    });
-    return THROW_OK("OK");
-  }),
-
   verifyEmail: publicProcedure.input(z.object({ token: z.string() })).mutation(async ({ ctx, input }) => {
     const data = await ctx.db.token.findUnique({ where: { token: input.token } });
     if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
@@ -55,6 +38,25 @@ export const userRouter = createTRPCRouter({
     ]);
     return THROW_OK("OK");
   }),
+
+  sendVerificationEmail: protectedProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ ctx, input }) => {
+      const data = await ctx.db.user.findUnique({ where: { email: input.email } });
+      if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
+      if (data.emailVerified) return THROW_TRPC_ERROR("CONFLICT");
+
+      const hashedToken = (await hash(data.id)).replace(/\+/g, "");
+      await ctx.db.token.create({ data: { token: hashedToken, expiryAt: getExpiryDate(), userId: data.id } });
+
+      const type: Email = "VERIFY";
+      await fetch(`${env.NEXTAUTH_URL}/api/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, token: hashedToken, type }),
+      });
+      return THROW_OK("OK");
+    }),
 
   updatePassword: publicProcedure
     .input(z.object({ token: z.string(), newPassword: schema.password }))
@@ -71,21 +73,23 @@ export const userRouter = createTRPCRouter({
       return THROW_OK("OK");
     }),
 
-  sendForgotPassword: publicProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ ctx, input }) => {
-    const data = await ctx.db.user.findUnique({ where: { email: input.email } });
-    if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
+  sendForgotPasswordEmail: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ ctx, input }) => {
+      const data = await ctx.db.user.findUnique({ where: { email: input.email } });
+      if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
 
-    const hashedToken = (await hash(data.id)).replace(/\+/g, "");
-    await ctx.db.token.create({ data: { token: hashedToken, expiryAt: getExpiryDate(), userId: data.id } });
+      const hashedToken = (await hash(data.id)).replace(/\+/g, "");
+      await ctx.db.token.create({ data: { token: hashedToken, expiryAt: getExpiryDate(), userId: data.id } });
 
-    const type: Email = "FORGOT_PASSWORD";
-    await fetch(`${env.NEXTAUTH_URL}/api/send`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: data.email, token: hashedToken, type }),
-    });
-    return THROW_OK("OK");
-  }),
+      const type: Email = "FORGOT_PASSWORD";
+      await fetch(`${env.NEXTAUTH_URL}/api/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, token: hashedToken, type }),
+      });
+      return THROW_OK("OK");
+    }),
 
   changePassword: protectedProcedure
     .input(z.object({ oldPassword: schema.password, newPassword: schema.password }))

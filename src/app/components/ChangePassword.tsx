@@ -33,7 +33,7 @@ export default function ChangePassword() {
     },
   });
 
-  const { mutate: sendToken } = api.user.sendVerifyEmail.useMutation({
+  const { mutate: sendToken } = api.user.sendVerificationEmail.useMutation({
     onError: (error) => alert(error.message),
     onSuccess: () => {
       alert("Email verification sent");
