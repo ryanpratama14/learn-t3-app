@@ -52,31 +52,28 @@ export const OK_MESSAGES: Record<TRPC_OK_CODE_KEY, string> = {
   PARTIAL_CONTENT: "Partial content received successfully.",
 };
 
-export const THROW_TRPC_ERROR = (code: TRPC_ERROR_CODE_KEY) => {
-  throw new TRPCError({ code, message: ERROR_MESSAGES[code] });
+export const THROW_TRPC_ERROR = (code: TRPC_ERROR_CODE_KEY, message?: string) => {
+  throw new TRPCError({ code, message: message ? message : ERROR_MESSAGES[code] });
 };
 
-export const THROW_OK = (code: TRPC_OK_CODE_KEY, message = true) => {
-  if (message) return { code, message: OK_MESSAGES[code] };
-  return code;
-};
+export const THROW_OK = (code: TRPC_OK_CODE_KEY, message?: string) => ({
+  code,
+  message: message ? message : OK_MESSAGES[code],
+});
 
-export const THROW_ERROR = (code: TRPC_ERROR_CODE_KEY, message = true) => {
-  if (message) return { code, message: ERROR_MESSAGES[code] };
-  return code;
-};
+export const THROW_ERROR = (code: TRPC_ERROR_CODE_KEY, message?: string) => ({
+  code,
+  message: message ? message : ERROR_MESSAGES[code],
+});
 
-export const THROW_CODE = (code: TRPC_CODE_KEY, message = true) => {
-  if (message)
-    return {
-      code,
-      message:
-        code in OK_MESSAGES
-          ? (OK_MESSAGES as Record<TRPC_CODE_KEY, string>)[code]
-          : (ERROR_MESSAGES as Record<TRPC_CODE_KEY, string>)[code],
-    };
-  return code;
-};
+export const THROW_CODE = (code: TRPC_CODE_KEY, message?: string) => ({
+  code,
+  message: message
+    ? message
+    : code in OK_MESSAGES
+      ? (OK_MESSAGES as Record<TRPC_CODE_KEY, string>)[code]
+      : (ERROR_MESSAGES as Record<TRPC_CODE_KEY, string>)[code],
+});
 
 export const prismaExclude = <T extends Entity, K extends Keys<T>>(type: T, omit: K[]) => {
   type Key = Exclude<Keys<T>, K>;

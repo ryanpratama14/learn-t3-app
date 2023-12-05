@@ -1,16 +1,10 @@
 import { env } from "@/env";
-import { type Email } from "@/server/api/schema/schema";
+import { type ForgotPassword } from "@/server/api/schema/schema";
 import { Body, Container, Head, Html, Link, Tailwind, Text } from "@react-email/components";
 import * as React from "react";
 
-interface VercelInviteUserEmailProps {
-  email: string;
-  token: string;
-  type: Email;
-}
-
-export const VercelInviteUserEmail = ({ email, token, type }: VercelInviteUserEmailProps) => {
-  const isVerify = type === "VERIFY" ? true : false;
+export const VercelInviteUserEmail = ({ email, token, type }: ForgotPassword) => {
+  const isVerify = type === "VERIFY_EMAIL" ? true : false;
 
   return (
     <Html>

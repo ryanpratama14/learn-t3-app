@@ -1,7 +1,7 @@
 import { hash, verify } from "argon2";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { prismaExclude, type RouterOutputs, THROW_TRPC_ERROR, THROW_OK } from "@/trpc/shared";
-import { type Email, schema } from "@/server/api/schema/schema";
+import { schema } from "@/server/api/schema/schema";
 import { z } from "zod";
 import { getExpiryDate, getNewDate } from "@/lib/utils";
 import { env } from "@/env";
@@ -40,7 +40,7 @@ export const userRouter = createTRPCRouter({
   }),
 
   sendVerificationEmail: protectedProcedure
-    .input(z.object({ email: z.string().email() }))
+    .input(z.object({ email: schema.email, type: schema.emailType.default("VERIFY_EMAIL") }))
     .mutation(async ({ ctx, input }) => {
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
@@ -49,12 +49,15 @@ export const userRouter = createTRPCRouter({
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
       await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
 
-      const type: Email = "VERIFY";
-      await fetch(`${env.NEXTAUTH_URL}/api/send`, {
+      const res = await fetch(`${env.NEXTAUTH_URL}/api/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, token: hashedToken, type }),
+        body: JSON.stringify({ email: data.email, token: hashedToken, type: input.type }),
       });
+      if (!res.ok) {
+        console.error(await res.json());
+        return THROW_TRPC_ERROR("INTERNAL_SERVER_ERROR");
+      }
       return THROW_OK("OK");
     }),
 
@@ -74,7 +77,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   sendForgotPasswordEmail: publicProcedure
-    .input(z.object({ email: z.string().email() }))
+    .input(z.object({ email: schema.email, type: schema.emailType.default("FORGOT_PASSWORD") }))
     .mutation(async ({ ctx, input }) => {
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
@@ -82,12 +85,15 @@ export const userRouter = createTRPCRouter({
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
       await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
 
-      const type: Email = "FORGOT_PASSWORD";
-      await fetch(`${env.NEXTAUTH_URL}/api/send`, {
+      const res = await fetch(`${env.NEXTAUTH_URL}/api/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, token: hashedToken, type }),
+        body: JSON.stringify({ email: data.email, token: hashedToken, type: input.type }),
       });
+      if (!res.ok) {
+        console.error(await res.json());
+        return THROW_TRPC_ERROR("INTERNAL_SERVER_ERROR");
+      }
       return THROW_OK("OK");
     }),
 
@@ -107,7 +113,7 @@ export const userRouter = createTRPCRouter({
       return THROW_OK("OK");
     }),
 
-  message: publicProcedure.query(() => ({ message: "Public message" })),
+  message: publicProcedure.mutation(() => THROW_OK("CREATED")),
 
   secretMessage: publicProcedure.query(() => ({ message: "Secret message" })),
 });

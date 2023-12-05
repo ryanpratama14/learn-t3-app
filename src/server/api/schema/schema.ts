@@ -1,12 +1,14 @@
 import { z } from "zod";
 
 export class schema {
-  static email = z.enum(["VERIFY", "FORGOT_PASSWORD"]);
+  static emailType = z.enum(["VERIFY_EMAIL", "FORGOT_PASSWORD"]);
   static order = z.enum(["asc", "desc"]).optional();
   static pagination = z.object({ page: z.number().min(1), limit: z.number().min(1).optional() });
+  static email = z.string().email("Please provide a valid email");
   static password = z.string().min(6);
-  static login = z.object({ email: z.string().email(), password: this.password });
-  static register = z.object({ email: z.string().email(), password: this.password });
+  static forgotPassword = z.object({ email: this.email, token: z.string(), type: schema.emailType });
+  static login = z.object({ email: this.email, password: this.password });
+  static register = z.object({ email: this.email, password: this.password });
 
   static user = class {
     static sorting = z.array(
@@ -41,7 +43,7 @@ export class schema {
 
     static create = z.object({
       name: z.string().min(4),
-      email: z.string().email(),
+      email: schema.email,
       positionId: z.string().nullish(),
       graduatedDate: z.string(),
     });
@@ -60,5 +62,6 @@ export class schema {
 
 export type Pagination = z.infer<typeof schema.pagination>;
 export type Login = z.infer<typeof schema.login>;
-export type Email = z.infer<typeof schema.email>;
+export type EmailType = z.infer<typeof schema.emailType>;
 export type Register = z.infer<typeof schema.register>;
+export type ForgotPassword = z.infer<typeof schema.forgotPassword>;
