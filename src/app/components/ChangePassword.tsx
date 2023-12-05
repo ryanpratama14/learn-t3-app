@@ -1,14 +1,10 @@
 "use client";
 
+import { type UserChangePasswordInput } from "@/server/api/routers/user";
 import { api } from "@/trpc/react";
 import { Fragment, useState } from "react";
 
-type Data = {
-  oldPassword: string;
-  newPassword: string;
-};
-
-const initialData = {
+const initialData: UserChangePasswordInput = {
   oldPassword: "",
   newPassword: "",
 };
@@ -16,7 +12,7 @@ const initialData = {
 export default function ChangePassword() {
   const [data, setData] = useState(initialData);
 
-  const handleChange = (name: keyof Data) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (name: keyof UserChangePasswordInput) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({ ...data, [name]: e.target.value });
   };
 

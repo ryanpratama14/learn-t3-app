@@ -4,7 +4,7 @@ import { uploadFiles } from "@/lib/uploadthing";
 import { isFileSizeAllowed } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function MultiUploader() {
   const [loading, setLoading] = useState(false);

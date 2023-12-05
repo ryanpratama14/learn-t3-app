@@ -1,6 +1,6 @@
 import { hash, verify } from "argon2";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { prismaExclude, type RouterOutputs, THROW_TRPC_ERROR, THROW_OK } from "@/trpc/shared";
+import { prismaExclude, type RouterInputs, type RouterOutputs, THROW_TRPC_ERROR, THROW_OK } from "@/trpc/shared";
 import { schema } from "@/server/api/schema/schema";
 import { z } from "zod";
 import { getExpiryDate, getNewDate } from "@/lib/utils";
@@ -120,3 +120,8 @@ export const userRouter = createTRPCRouter({
 
 // outputs
 export type User = RouterOutputs["user"]["detail"];
+// export type UserList = RouterOutputs["user"]["list"];
+
+// inputs
+export type UserDetailInput = RouterInputs["user"]["detail"];
+export type UserChangePasswordInput = RouterInputs["user"]["changePassword"];

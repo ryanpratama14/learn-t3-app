@@ -7,16 +7,15 @@ import Login from "@/app/components/Login";
 import Register from "@/app/components/Register";
 import MultiUploader from "@/app/components/MultiUploader";
 import ChangePassword from "@/app/components/ChangePassword";
+import { type Login as TLogin } from "@/server/api/schema/schema";
 
 export default async function Home() {
   const session = await getServerAuthSession();
   const data = session ? await api.user.detail.query() : undefined;
 
-  const createUser = async (formData: FormData) => {
+  const createUser = async (data: TLogin) => {
     "use server";
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    await api.user.register.mutate({ email, password });
+    await api.user.register.mutate(data);
   };
 
   return (

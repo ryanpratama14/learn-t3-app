@@ -2,7 +2,7 @@
 
 import { api } from "@/trpc/react";
 import { redirect, useSearchParams, notFound } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 
 type Data = {
   password: string;
