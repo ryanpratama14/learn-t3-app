@@ -7,6 +7,7 @@ import { Fragment, useState } from "react";
 const initialData: UserChangePasswordInput = {
   oldPassword: "",
   newPassword: "",
+  confirmPassword: "",
 };
 
 export default function ChangePassword() {
@@ -18,6 +19,7 @@ export default function ChangePassword() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (data.newPassword !== data.confirmPassword) return alert("Passwords don't match");
     changePassword(data);
   };
 
@@ -50,6 +52,13 @@ export default function ChangePassword() {
         <input
           value={data.newPassword}
           onChange={handleChange("newPassword")}
+          className="p-2 border-2 border-gray-200 rounded-xl"
+          type="password"
+          required
+        />
+        <input
+          value={data.confirmPassword}
+          onChange={handleChange("confirmPassword")}
           className="p-2 border-2 border-gray-200 rounded-xl"
           type="password"
           required

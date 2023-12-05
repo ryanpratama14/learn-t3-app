@@ -98,13 +98,13 @@ export const userRouter = createTRPCRouter({
     }),
 
   changePassword: protectedProcedure
-    .input(z.object({ oldPassword: schema.password, newPassword: schema.password }))
+    .input(z.object({ oldPassword: schema.password, newPassword: schema.password, confirmPassword: schema.password }))
     .mutation(async ({ ctx, input }) => {
       const data = await ctx.db.user.findUnique({ where: { id: ctx.session.user.id } });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
 
       const isOldPasswordValid = await verify(data.password, input.oldPassword);
-      if (!isOldPasswordValid) return THROW_TRPC_ERROR("BAD_REQUEST");
+      if (!isOldPasswordValid) return THROW_TRPC_ERROR("BAD_REQUEST", "Old password is wrong");
 
       await ctx.db.user.update({
         where: { id: ctx.session.user.id },
