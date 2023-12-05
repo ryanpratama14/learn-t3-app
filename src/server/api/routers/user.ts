@@ -49,7 +49,7 @@ export const userRouter = createTRPCRouter({
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
       await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
 
-      const res = await fetch(`${env.NEXTAUTH_URL}/api/send`, {
+      const res = await fetch(`${env.NEXT_PUBLIC_API}/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, token: hashedToken, type: input.type }),
@@ -85,7 +85,7 @@ export const userRouter = createTRPCRouter({
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
       await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
 
-      const res = await fetch(`${env.NEXTAUTH_URL}/api/send`, {
+      const res = await fetch(`${env.NEXT_PUBLIC_API}/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, token: hashedToken, type: input.type }),
