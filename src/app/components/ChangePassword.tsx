@@ -24,7 +24,7 @@ export default function ChangePassword() {
   };
 
   const { mutate: changePassword } = api.user.changePassword.useMutation({
-    onError: () => alert("Incorrect old password"),
+    onError: ({ message }) => alert(message),
     onSuccess: () => {
       alert("Password changed");
       setData(initialData);
