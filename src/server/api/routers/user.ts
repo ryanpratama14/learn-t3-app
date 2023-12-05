@@ -25,7 +25,7 @@ export const userRouter = createTRPCRouter({
 
   isTokenValid: publicProcedure.input(z.object({ token: z.string() })).query(async ({ ctx, input }) => {
     const data = await ctx.db.token.findUnique({ where: { token: input.token } });
-    if (!data || data.expiryAt < getNewDate()) return true;
+    if (!data || data.expirationDate < getNewDate()) return true;
     return false;
   }),
 
@@ -34,7 +34,7 @@ export const userRouter = createTRPCRouter({
     if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
     await ctx.db.$transaction([
       ctx.db.user.update({ where: { id: data.userId }, data: { emailVerified: getNewDate() } }),
-      ctx.db.token.update({ where: { id: data.id }, data: { expiryAt: getNewDate() } }),
+      ctx.db.token.update({ where: { id: data.id }, data: { expirationDate: getNewDate() } }),
     ]);
     return THROW_OK("OK");
   }),
@@ -47,7 +47,7 @@ export const userRouter = createTRPCRouter({
       if (data.emailVerified) return THROW_TRPC_ERROR("CONFLICT");
 
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
-      await ctx.db.token.create({ data: { token: hashedToken, expiryAt: getExpiryDate(), userId: data.id } });
+      await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
 
       const type: Email = "VERIFY";
       await fetch(`${env.NEXTAUTH_URL}/api/send`, {
@@ -68,7 +68,7 @@ export const userRouter = createTRPCRouter({
           where: { id: data.userId },
           data: { password: await hash(input.newPassword), passwordChanged: getNewDate() },
         }),
-        ctx.db.token.update({ where: { token: input.token }, data: { expiryAt: getNewDate() } }),
+        ctx.db.token.update({ where: { token: input.token }, data: { expirationDate: getNewDate() } }),
       ]);
       return THROW_OK("OK");
     }),
@@ -80,7 +80,7 @@ export const userRouter = createTRPCRouter({
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
 
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
-      await ctx.db.token.create({ data: { token: hashedToken, expiryAt: getExpiryDate(), userId: data.id } });
+      await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
 
       const type: Email = "FORGOT_PASSWORD";
       await fetch(`${env.NEXTAUTH_URL}/api/send`, {
