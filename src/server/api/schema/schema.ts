@@ -8,7 +8,7 @@ export class schema {
   static password = z.string().min(6);
   static forgotPassword = z.object({ email: this.email, token: z.string(), type: schema.emailType });
   static login = z.object({ email: this.email, password: this.password });
-  static register = z.object({ email: this.email, password: this.password });
+  static register = z.object({ email: this.email, password: this.password, type: schema.emailType.default("VERIFY_EMAIL") });
 
   static user = class {
     static sorting = z.array(

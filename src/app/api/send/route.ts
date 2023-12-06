@@ -15,12 +15,11 @@ export async function POST(req: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
-    const { email, token, type } = validation.data;
     const { data, error } = await resend.emails.send({
       from: "Ryan <donotreply@ryanpratama.tech>",
-      to: [email],
+      to: [validation.data.email],
       subject: "Hello World",
-      react: VercelInviteUserEmail({ email, token, type }),
+      react: VercelInviteUserEmail(validation.data),
     });
     if (error) return NextResponse.json({ error }, { status: 404 });
     return NextResponse.json({ data });

@@ -1,25 +1,51 @@
 import { hash, verify } from "argon2";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { prismaExclude, type RouterInputs, type RouterOutputs, THROW_TRPC_ERROR, THROW_OK } from "@/trpc/shared";
-import { schema } from "@/server/api/schema/schema";
+import { type EmailType, schema } from "@/server/api/schema/schema";
 import { z } from "zod";
 import { getExpiryDate, getNewDate } from "@/lib/utils";
 import { env } from "@/env";
+
+const getHashedToken = async (token: string) => {
+  return (await hash(token)).replace(/\+/g, "");
+};
+
+const sendEmail = async ({ email, hashedToken, type }: { email: string; hashedToken: string; type: EmailType }) => {
+  const res = await fetch(`${env.NEXT_PUBLIC_API}/send`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, token: hashedToken, type }),
+  });
+  if (!res.ok) {
+    console.error(await res.json());
+    return THROW_TRPC_ERROR("INTERNAL_SERVER_ERROR");
+  }
+};
 
 export const userRouter = createTRPCRouter({
   register: publicProcedure.input(schema.register).mutation(async ({ input, ctx }) => {
     const data = await ctx.db.user.findUnique({ where: { email: input.email } });
     if (data) return THROW_TRPC_ERROR("CONFLICT");
-    await ctx.db.user.create({ data: { email: input.email, password: await hash(input.password) } });
+    const { email, id } = await ctx.db.user.create({ data: { email: input.email, password: await hash(input.password) } });
+    const hashedToken = await getHashedToken(id);
+    await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: id } });
+    await sendEmail({ email, hashedToken, type: input.type });
     return THROW_OK("CREATED");
   }),
 
   detail: protectedProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
-      select: { image: true, ...prismaExclude("User", ["password"]) },
+      select: { image: true, files: true, ...prismaExclude("User", ["password"]) },
     });
     if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
+    return data;
+  }),
+
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const data = await ctx.db.user.findMany({
+      select: { image: true, files: true, ...prismaExclude("User", ["password"]) },
+    });
     return data;
   }),
 
@@ -45,19 +71,9 @@ export const userRouter = createTRPCRouter({
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
       if (data.emailVerified) return THROW_TRPC_ERROR("CONFLICT");
-
-      const hashedToken = (await hash(data.id)).replace(/\+/g, "");
+      const hashedToken = await getHashedToken(data.id);
       await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
-
-      const res = await fetch(`${env.NEXT_PUBLIC_API}/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, token: hashedToken, type: input.type }),
-      });
-      if (!res.ok) {
-        console.error(await res.json());
-        return THROW_TRPC_ERROR("INTERNAL_SERVER_ERROR");
-      }
+      await sendEmail({ email: data.email, hashedToken, type: input.type });
       return THROW_OK("OK");
     }),
 
@@ -81,19 +97,9 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
-
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
       await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
-
-      const res = await fetch(`${env.NEXT_PUBLIC_API}/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, token: hashedToken, type: input.type }),
-      });
-      if (!res.ok) {
-        console.error(await res.json());
-        return THROW_TRPC_ERROR("INTERNAL_SERVER_ERROR");
-      }
+      await sendEmail({ email: data.email, hashedToken, type: input.type });
       return THROW_OK("OK");
     }),
 
@@ -102,10 +108,8 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const data = await ctx.db.user.findUnique({ where: { id: ctx.session.user.id } });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
-
       const isOldPasswordValid = await verify(data.password, input.oldPassword);
-      if (!isOldPasswordValid) return THROW_TRPC_ERROR("BAD_REQUEST", "Old password is wrong");
-
+      if (!isOldPasswordValid) return THROW_TRPC_ERROR("BAD_REQUEST");
       await ctx.db.user.update({
         where: { id: ctx.session.user.id },
         data: { password: await hash(input.newPassword), passwordChanged: getNewDate() },
