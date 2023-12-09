@@ -3,10 +3,6 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { LOCALE_TAG } from "@/trpc/shared";
 
-type PowOf2 = 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024;
-type SizeUnit = "B" | "KB" | "MB" | "GB";
-type FileSize = `${PowOf2}${SizeUnit}`;
-
 export const loadToTop = () => {
   window.scrollTo({
     top: 0,
@@ -100,28 +96,32 @@ export const formatDateLong = (date: Date): string => {
   });
 };
 
+type PowOf2 = 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024;
+type SizeUnit = "B" | "KB" | "MB" | "GB";
+type FileSize = `${PowOf2}${SizeUnit}`;
+
+const bytesInUnit: Record<SizeUnit, number> = {
+  B: 1,
+  KB: 1024,
+  MB: 1024 * 1024,
+  GB: 1024 * 1024 * 1024,
+};
+
+const powOf2: Record<PowOf2, number> = {
+  1: 1,
+  2: 2,
+  4: 4,
+  8: 8,
+  16: 16,
+  32: 32,
+  64: 64,
+  128: 128,
+  256: 256,
+  512: 512,
+  1024: 1024,
+};
+
 export const isFileSizeAllowed = (maxFileSize: FileSize, fileSize: number): boolean => {
-  const bytesInUnit: Record<SizeUnit, number> = {
-    B: 1,
-    KB: 1024,
-    MB: 1024 * 1024,
-    GB: 1024 * 1024 * 1024,
-  };
-
-  const powOf2: Record<PowOf2, number> = {
-    1: 1,
-    2: 2,
-    4: 4,
-    8: 8,
-    16: 16,
-    32: 32,
-    64: 64,
-    128: 128,
-    256: 256,
-    512: 512,
-    1024: 1024,
-  };
-
   const fileSizeRegex = /^(\d+)(B|KB|MB|GB)$/;
   const match = maxFileSize.match(fileSizeRegex);
   const size = parseInt(match![1]!, 10);
