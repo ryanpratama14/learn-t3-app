@@ -6,9 +6,7 @@ import { z } from "zod";
 import { getExpiryDate, getNewDate } from "@/lib/utils";
 import { env } from "@/env";
 
-const getHashedToken = async (token: string) => {
-  return (await hash(token)).replace(/\+/g, "");
-};
+const getHashedToken = async (string: string) => (await hash(string)).replace(/\+/g, "");
 
 const sendEmail = async ({ email, hashedToken, type }: { email: string; hashedToken: string; type: EmailType }) => {
   const res = await fetch(`${env.NEXT_PUBLIC_API}/send`, {
