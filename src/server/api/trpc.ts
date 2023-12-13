@@ -22,17 +22,23 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
   },
 });
 
+const enforceIsAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) return THROW_TRPC_ERROR("UNAUTHORIZED");
+  return next({ ctx: { session: { ...ctx.session, user: ctx.session.user } } });
+});
+
 const enforceAdminIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || ctx.session.user.roleId !== 1) return THROW_TRPC_ERROR("UNAUTHORIZED");
+  if (!ctx.session || !ctx.session.user || ctx.session.user.isSuperAdmin) return THROW_TRPC_ERROR("UNAUTHORIZED");
   return next({ ctx: { session: { ...ctx.session, user: ctx.session.user } } });
 });
 
 const enforceSuperAdminIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || ctx.session.user.roleId !== 2) return THROW_TRPC_ERROR("UNAUTHORIZED");
+  if (!ctx.session || !ctx.session.user || !ctx.session.user.isSuperAdmin) return THROW_TRPC_ERROR("UNAUTHORIZED");
   return next({ ctx: { session: { ...ctx.session, user: ctx.session.user } } });
 });
 
 export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
+export const protectedProcedure = t.procedure.use(enforceIsAuthed);
 export const adminProcedure = t.procedure.use(enforceAdminIsAuthed);
 export const superAdminProcedure = t.procedure.use(enforceSuperAdminIsAuthed);
