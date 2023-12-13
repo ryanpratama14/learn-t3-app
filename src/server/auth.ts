@@ -23,10 +23,10 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     jwt: async ({ token, user }) => ({ ...token, ...user }),
-    session: async ({ session, token }) => ({
-      ...session,
-      user: { ...session.user, id: token.id, isSuperAdmin: token.roleId === 2 ? true : false },
-    }),
+    session: async ({ session, token }) => {
+      const isSuperAdmin = token.roleId === 2 ? true : false;
+      return { ...session, user: { ...session.user, id: token.id, isSuperAdmin } };
+    },
   },
   providers: [
     GoogleProvider({
