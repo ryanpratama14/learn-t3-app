@@ -24,6 +24,8 @@ model User {
     image           File?     @relation("userImage", fields: [imageId], references: [id])
     imageId         String?   @unique
     createdDate     DateTime  @default(now())
+    role            Role      @relation(fields: [roleId], references: [id])
+    roleId          Int
 }
 
 model Token {
@@ -43,4 +45,10 @@ model File {
     ownerId     String
     imageOwner  User?    @relation("userImage")
     createdDate DateTime @default(now())
+}
+
+model Role {
+    id   Int    @id @default(autoincrement())
+    name String
+    User User[]
 }

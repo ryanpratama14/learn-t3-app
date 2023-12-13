@@ -1,5 +1,5 @@
 import { hash, verify } from "argon2";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, adminProcedure, publicProcedure, superAdminProcedure } from "@/server/api/trpc";
 import { prismaExclude, type RouterInputs, type RouterOutputs, THROW_TRPC_ERROR, THROW_OK } from "@/trpc/shared";
 import { type EmailType, schema } from "@/server/api/schema/schema";
 import { z } from "zod";
@@ -24,14 +24,17 @@ export const userRouter = createTRPCRouter({
   register: publicProcedure.input(schema.register).mutation(async ({ input, ctx }) => {
     const data = await ctx.db.user.findUnique({ where: { email: input.email } });
     if (data) return THROW_TRPC_ERROR("CONFLICT");
-    const { email, id } = await ctx.db.user.create({ data: { email: input.email, password: await hash(input.password) } });
+
+    const { email, id } = await ctx.db.user.create({
+      data: { email: input.email, password: await hash(input.password), roleId: 1 },
+    });
     const hashedToken = await getHashedToken(id);
     await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: id } });
     await sendEmail({ email, hashedToken, type: input.type });
     return THROW_OK("CREATED");
   }),
 
-  detail: protectedProcedure.query(async ({ ctx }) => {
+  detail: adminProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
       select: { image: true, files: true, ...prismaExclude("User", ["password"]) },
@@ -40,7 +43,7 @@ export const userRouter = createTRPCRouter({
     return data;
   }),
 
-  list: protectedProcedure.query(async ({ ctx }) => {
+  list: adminProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.user.findMany({
       select: { image: true, files: true, ...prismaExclude("User", ["password"]) },
     });
@@ -63,7 +66,7 @@ export const userRouter = createTRPCRouter({
     return THROW_OK("OK");
   }),
 
-  sendVerificationEmail: protectedProcedure
+  sendVerificationEmail: adminProcedure
     .input(z.object({ email: schema.email, type: schema.emailType.default("VERIFY_EMAIL") }))
     .mutation(async ({ ctx, input }) => {
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
@@ -101,7 +104,7 @@ export const userRouter = createTRPCRouter({
       return THROW_OK("OK");
     }),
 
-  changePassword: protectedProcedure
+  changePassword: adminProcedure
     .input(z.object({ oldPassword: schema.password, newPassword: schema.password, confirmPassword: schema.password }))
     .mutation(async ({ ctx, input }) => {
       const data = await ctx.db.user.findUnique({ where: { id: ctx.session.user.id } });
@@ -118,6 +121,8 @@ export const userRouter = createTRPCRouter({
   message: publicProcedure.mutation(() => THROW_OK("CREATED")),
 
   secretMessage: publicProcedure.query(() => ({ message: "Secret message" })),
+
+  superAdminMessage: superAdminProcedure.query(() => ({ message: "SUPER ADMIN" })),
 });
 
 // outputs

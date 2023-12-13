@@ -11,15 +11,9 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      roleId: number;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -29,7 +23,7 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     jwt: async ({ token, user }) => ({ ...token, ...user }),
-    session: async ({ session, token }) => ({ ...session, user: { ...session.user, id: token.id } }),
+    session: async ({ session, token }) => ({ ...session, user: { ...session.user, id: token.id, roleId: token.roleId } }),
   },
   providers: [
     GoogleProvider({
