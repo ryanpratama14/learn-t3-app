@@ -74,10 +74,8 @@ export const getEndDate = (dateString: string): Date => {
   return updatedDate;
 };
 
-export const getTokenExpiryDate = (): Date => {
-  const date = getNewDate();
-  return new Date(date.getMonth() + 3600000); // 1 hour
-};
+
+export const getTokenExpiryDate = (): Date => new Date(getNewDate().getTime() + 3600000); // 1 hour;
 
 export const getExpiryDate = ({ days = 0, months = 0 }: { days: number; months: number }): Date => {
   const date = getNewDate();
