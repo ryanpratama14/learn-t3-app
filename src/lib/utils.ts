@@ -14,7 +14,7 @@ export const cn = (...inputs: ClassValue[]): string => twMerge(clsx(inputs));
 
 export const consoleError = (error: string) => {
   console.error(
-    `❌ ${new Date().toLocaleTimeString(LOCALE_TAG, { hour: "2-digit", minute: "2-digit", second: "2-digit" })} 👉 ${error}`
+    `❌ ${getNewDate().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" })} 👉 ${error}`
   );
 };
 
@@ -42,7 +42,7 @@ export const createSearchParams = (
 };
 
 export const getTodayDate = () => {
-  const date = new Date();
+  const date = getNewDate();
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
   const day = String(date.getUTCDate()).padStart(2, "0");
@@ -50,7 +50,7 @@ export const getTodayDate = () => {
 };
 
 export const getTodayDateLong = (): string => {
-  return new Date().toLocaleDateString(LOCALE_TAG, {
+  return getNewDate().toLocaleDateString(LOCALE_TAG, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -62,26 +62,78 @@ export const getNewDate = (dateString?: string): Date => {
   return new Date();
 };
 
-export const getStartDate = (date: string): Date => {
-  const updatedDate = new Date(date);
-  updatedDate.setUTCHours(0, 0, 0, 0);
+export const getStartDate = (dateString: string): Date => {
+  const updatedDate = getNewDate(dateString);
+  updatedDate.setHours(0, 0, 0, 0);
   return updatedDate;
 };
 
-export const getEndDate = (date: string): Date => {
-  const updatedDate = new Date(date);
-  updatedDate.setUTCHours(23, 59, 59, 999);
+export const getEndDate = (dateString: string): Date => {
+  const updatedDate = getNewDate(dateString);
+  updatedDate.setHours(23, 59, 59, 999);
   return updatedDate;
 };
 
-export const getExpiryDate = (): Date => {
-  const currentDate = new Date();
-  const millisecondsToAdd = 3600000; // 1 hour
-  return new Date(currentDate.getTime() + millisecondsToAdd);
+export const getTokenExpiryDate = (): Date => {
+  const date = getNewDate();
+  return new Date(date.getMonth() + 3600000); // 1 hour
 };
 
-export const formatDate = (dateString: Date): string => {
-  const date = new Date(dateString);
+export const getExpiryDate = ({ days = 0, months = 0 }: { days: number; months: number }): Date => {
+  const date = getNewDate();
+  date.setDate(date.getDate() + days);
+  date.setMonth(date.getMonth() + months);
+  date.setHours(23, 59, 59, 999);
+  return date;
+};
+
+export const getExpiryDateFromDate = (dateString: string): Date => {
+  const date = getNewDate(dateString);
+  date.setHours(23, 59, 59, 999);
+  return date;
+};
+
+export const getTodayExpiryDate = (): Date => {
+  const date = getNewDate();
+  date.setHours(23, 59, 59, 999);
+  return date;
+};
+
+export const getRemainingMonthsAndDays = (targetDate: Date): { months: number; days: number } => {
+  const currentDate = getNewDate();
+
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const currentDay = currentDate.getDate();
+
+  const targetYear = targetDate.getFullYear();
+  const targetMonth = targetDate.getMonth();
+  const targetDay = targetDate.getDate();
+
+  let remainingMonths = (targetYear - currentYear) * 12 + (targetMonth - currentMonth);
+  let remainingDays = targetDay - currentDay;
+
+  if (remainingDays < 0) {
+    remainingMonths--;
+    const lastMonthDays = new Date(targetYear, targetMonth, 0).getDate();
+    remainingDays = lastMonthDays + remainingDays;
+  }
+
+  return { months: remainingMonths, days: remainingDays };
+};
+
+export const isDateExpired = (expiryDate: Date): boolean => expiryDate <= getNewDate();
+
+export const isDateToday = (date: Date): boolean => {
+  const currentDate = getNewDate();
+  return (
+    date.getDate() === currentDate.getDate() &&
+    date.getMonth() === currentDate.getMonth() &&
+    date.getFullYear() === currentDate.getFullYear()
+  );
+};
+
+export const formatDate = (date: Date): string => {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
   const day = String(date.getUTCDate()).padStart(2, "0");

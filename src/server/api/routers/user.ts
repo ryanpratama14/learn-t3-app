@@ -3,7 +3,7 @@ import { createTRPCRouter, adminProcedure, publicProcedure, superAdminProcedure 
 import { prismaExclude, type RouterInputs, type RouterOutputs, THROW_TRPC_ERROR, THROW_OK } from "@/trpc/shared";
 import { type EmailType, schema } from "@/server/api/schema/schema";
 import { z } from "zod";
-import { getExpiryDate, getNewDate } from "@/lib/utils";
+import { getTokenExpiryDate, getNewDate } from "@/lib/utils";
 import { env } from "@/env";
 
 const getHashedToken = async (string: string) => (await hash(string)).replace(/\+/g, "");
@@ -29,7 +29,7 @@ export const userRouter = createTRPCRouter({
       data: { email: input.email, password: await hash(input.password), roleId: 1 },
     });
     const hashedToken = await getHashedToken(id);
-    await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: id } });
+    await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getTokenExpiryDate(), userId: id } });
     await sendEmail({ email, hashedToken, type: input.type });
     return THROW_OK("CREATED");
   }),
@@ -47,6 +47,7 @@ export const userRouter = createTRPCRouter({
     const data = await ctx.db.user.findMany({
       select: { image: true, files: true, ...prismaExclude("User", ["password"]) },
     });
+
     return data;
   }),
 
@@ -73,7 +74,7 @@ export const userRouter = createTRPCRouter({
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
       if (data.emailVerified) return THROW_TRPC_ERROR("CONFLICT");
       const hashedToken = await getHashedToken(data.id);
-      await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
+      await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getTokenExpiryDate(), userId: data.id } });
       await sendEmail({ email: data.email, hashedToken, type: input.type });
       return THROW_OK("OK");
     }),
@@ -99,7 +100,7 @@ export const userRouter = createTRPCRouter({
       const data = await ctx.db.user.findUnique({ where: { email: input.email } });
       if (!data) return THROW_TRPC_ERROR("NOT_FOUND");
       const hashedToken = (await hash(data.id)).replace(/\+/g, "");
-      await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getExpiryDate(), userId: data.id } });
+      await ctx.db.token.create({ data: { token: hashedToken, expirationDate: getTokenExpiryDate(), userId: data.id } });
       await sendEmail({ email: data.email, hashedToken, type: input.type });
       return THROW_OK("OK");
     }),
